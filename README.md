@@ -1,6 +1,6 @@
 # Lab Files: "Implementing IoT using Microsoft Azure"
 
-By: Baskoro Indrayana <baskoro.indrayana@lightstream.asia>
+By: Baskoro Indrayana
 
 ## Description
 
@@ -8,4 +8,4 @@ Azure IoT Demo project files (using simulated DHT sensors, measuring temperature
 
 ## Credits
 
-    - Microsoft docs, for most code in this repo. The code has been modified to cater to the labs.
+- Microsoft docs, for most code in this repo. The code has been modified to cater to the labs.
