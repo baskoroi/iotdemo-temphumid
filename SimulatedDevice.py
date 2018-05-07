@@ -1,6 +1,8 @@
 import random
-import time
+import json
+import time, datetime
 import sys
+
 import iothub_client
 from iothub_client import IoTHubClient, IoTHubClientError, IoTHubTransportProvider, IoTHubClientResult
 from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubError, DeviceMethodReturnValue
@@ -9,13 +11,17 @@ from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubE
 # (use primary first, if not working use secondary)
 CONNECTION_STRING   = "<use_your_device_connection_string>"
 DEVICE_ID           = "<use_your_device_id>"
+COUNTRY             = "<use_your_office_country_code>"  # ID, SG, etc.
+
+# config for DHT device & IoT Hub
 PROTOCOL            = IoTHubTransportProvider.MQTT
 MESSAGE_TIMEOUT     = 10000
 AVG_TEMPERATURE     = 25.2  # in Celcius
 AVG_HUMIDITY        = 0.7   # 70%
 SEND_CALLBACKS      = 0
-MSG_TXT             = "{\"deviceId\": \"%s\", \"temperature\": %.2f, \"humidity\": %.2f}"
+MSG_TXT             = "{\"deviceId\": \"%s\", \"country\": \"%s\", \"temperature\": %.2f, \"humidity\": %.2f, \"timestamp\": \"%s\"}"
 
+# confirm message sends
 def send_confirmation_callback(message, result, user_context):
     global SEND_CALLBACKS
     print("Confirmation[%d] received for message with result = %s" % (user_context, result))
@@ -27,15 +33,24 @@ def send_confirmation_callback(message, result, user_context):
     SEND_CALLBACKS += 1
     print("Total calls confirmed: %d" % SEND_CALLBACKS)
 
+# for connection to IoT Hub
 def iothub_client_init():
     # prepare iothub client
     client = IoTHubClient(CONNECTION_STRING, PROTOCOL)
     # set the time until a message times out
     client.set_option("messageTimeout", MESSAGE_TIMEOUT)
     client.set_option("logtrace", 0)
-    client.set_option("product_info", "DummyDHTSensor_Demo")
+    client.set_option("product_info", "For DummyDHTSensor_Demo devices")
     return client
 
+# to handle timestamp for JSON message
+date_handler = lambda obj: (
+    obj.isoformat()
+    if isinstance(obj, (datetime.datetime, datetime.date))
+    else None
+)
+
+# where the generated telemetry temp/humid data gets sent to IoT Hub
 def iothub_client_telemetry_sample_run():
     try:
         client = iothub_client_init()
@@ -43,9 +58,11 @@ def iothub_client_telemetry_sample_run():
         message_counter = 0
 
         while True:
-            rand_temperature    = AVG_TEMPERATURE + (random.random() * 1 - 1)
-            rand_humidity       = AVG_HUMIDITY + (random.random())
-            msg_txt_formatted   = MSG_TXT % (DEVICE_ID, rand_temperature, rand_humidity)
+            rand_temperature    = AVG_TEMPERATURE + (random.uniform(-0.25, 0.2))
+            rand_humidity       = AVG_HUMIDITY + (random.uniform(-0.1, 0.08))
+            msg_txt_formatted   = MSG_TXT % (DEVICE_ID, COUNTRY, rand_temperature, rand_humidity, 
+                                             json.dumps(datetime.datetime.now(), 
+                                                        default=date_handler).replace("\"", ""))
 
             # messages can be encoded as string or bytearray
             if (message_counter & 1) == 1:
@@ -68,7 +85,7 @@ def iothub_client_telemetry_sample_run():
             
             status = client.get_send_status()
             print("Send status: %s" % status)
-            time.sleep(30) # 30 seconds
+            time.sleep(10) # 10 seconds
 
             status = client.get_send_status()
             print("Send status: %s" % status)
