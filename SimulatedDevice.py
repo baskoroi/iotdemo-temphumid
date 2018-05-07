@@ -8,12 +8,13 @@ from iothub_client import IoTHubMessage, IoTHubMessageDispositionResult, IoTHubE
 # replace with your device connection string (NOT IoT Hub connection string)
 # (use primary first, if not working use secondary)
 CONNECTION_STRING   = "<use_your_device_connection_string>"
+DEVICE_ID           = "<use_your_device_id>"
 PROTOCOL            = IoTHubTransportProvider.MQTT
 MESSAGE_TIMEOUT     = 10000
 AVG_TEMPERATURE     = 25.2  # in Celcius
 AVG_HUMIDITY        = 0.7   # 70%
 SEND_CALLBACKS      = 0
-MSG_TXT             = "{\"deviceId\": \"DummyDHTSensor_Demo\", \"temperature\": %.2f, \"humidity\": %.2f}"
+MSG_TXT             = "{\"deviceId\": \"%s\", \"temperature\": %.2f, \"humidity\": %.2f}"
 
 def send_confirmation_callback(message, result, user_context):
     global SEND_CALLBACKS
@@ -44,7 +45,7 @@ def iothub_client_telemetry_sample_run():
         while True:
             rand_temperature    = AVG_TEMPERATURE + (random.random() * 1 - 1)
             rand_humidity       = AVG_HUMIDITY + (random.random())
-            msg_txt_formatted   = MSG_TXT % (rand_temperature, rand_humidity)
+            msg_txt_formatted   = MSG_TXT % (DEVICE_ID, rand_temperature, rand_humidity)
 
             # messages can be encoded as string or bytearray
             if (message_counter & 1) == 1:
@@ -79,8 +80,8 @@ def iothub_client_telemetry_sample_run():
     except KeyboardInterrupt:
         print("IoTHubClient sample stopped")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("Simulating a device using the Azure IoT Hub Device SDK for Python")
-    print("- Protocol: %s" % PROTOCOL)
-    print("- Connection string: %s" % CONNECTION_STRING)
+    print("- Protocol           : %s" % PROTOCOL)
+    print("- Connection string  : %s" % CONNECTION_STRING)
     iothub_client_telemetry_sample_run()
