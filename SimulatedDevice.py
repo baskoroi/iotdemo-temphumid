@@ -85,7 +85,7 @@ def iothub_client_telemetry_sample_run():
             
             status = client.get_send_status()
             print("Send status: %s" % status)
-            time.sleep(10) # 10 seconds
+            time.sleep(5) # 5 seconds
 
             status = client.get_send_status()
             print("Send status: %s" % status)
