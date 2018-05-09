@@ -3,3 +3,4 @@ ConnectionStrings.txt
 
 # other files to ignore
 *.ignore*
+.ignored/*

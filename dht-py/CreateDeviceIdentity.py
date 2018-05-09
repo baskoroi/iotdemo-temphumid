@@ -6,7 +6,7 @@ from iothub_service_client import IoTHubDeviceStatus, IoTHubError
 
 # replace with your IoT Hub connection string
 CONNECTION_STRING = "<use_your_iothub_connection_string>"
-DEVICE_ID = "DummyDHTSensor_Demo"
+DEVICE_ID = "<use_your_device_id>"
 
 def print_device_info(title, iothub_device):
     print(title + ":")
