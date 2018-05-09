@@ -1,2 +1,5 @@
-# files to ignore
+# Azure connection strings
+ConnectionStrings.txt
+
+# other files to ignore
 *.ignore*
